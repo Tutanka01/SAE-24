@@ -1,0 +1,25 @@
+FROM ubuntu:latest
+
+# Copie du fichier de configuration personnalisé
+COPY vsftpd.conf /etc/vsftpd.conf
+
+# Installation du serveur FTP
+RUN apt-get update && apt-get install -y vsftpd
+
+# Création de l'utilisateur FTP
+RUN useradd -m ftpuser -s /bin/bash
+
+# Définition du mot de passe de l'utilisateur FTP
+RUN echo "ftpuser:ftpuser" | chpasswd
+
+# Copie des fichiers de l'utilisateur FTP
+COPY files /home/ftpuser/files
+
+# Configuration des autorisations des fichiers
+RUN chown -R ftp:ftp /home/ftpuser/files
+
+# Exposition du port FTP (port 21)
+EXPOSE 21
+
+# Commande d'exécution du serveur FTP
+CMD ["vsftpd", "/etc/vsftpd.conf"]
